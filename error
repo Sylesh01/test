@@ -1,0 +1,1 @@
+ncaught Error: Call to undefined function call_user_function_array() in C:\xampp\htdocs\Projects\mvc\app\libraries\Core.php:24 Stack trace: #0 C:\xampp\htdocs\Projects\mvc\public\index.php(5): Core->__construct() #1 {main} thrown in C:\xampp\htdocs\Projects\mvc\app\libraries\Core.php on line 24
