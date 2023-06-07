@@ -1,39 +1,107 @@
 <?php
 
-use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\Entity\NodeType;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
-//hook_form_alter
+/**
+ * Implements hook_install().
+ */
+function landingpage_install() {
+  $node_types = NodeType::loadMultiple();
+  $node_ids = []; 
+  foreach ($node_types as $node){
+        $node_ids[] = $node->id();
+  }
+  // Create the custom content type.
+  $type = 'landing_page';
+  $name = 'Landing Page';
+  if (!in_array($type, $node_ids)) {
+  $description = 'A custom content type created programmatically.';
+  $node_type = NodeType::create([
+    'type' => $type,
+    'name' => $name,
+    'description' => $description,
+    'help' => '',
+    'new_revision' => TRUE,
+  ]);
+  $node_type->save();
 
-function landingpage_form_alter(&$form,  $form_state, $form_id) {
-    // kint($form_id);
-    if ($form_id == 'node_page_form'){
-        $form['new_field'] = [
-            '#type' => 'full_html',
-            '#title' => t('New Field'),
-            '#default_value' => '',
-            '#required' => FALSE,
-          ];
-    }
+// Create the field storage for custom_field1.
+$storage = FieldStorageConfig::create([
+  'field_name' => 'custom_field1',
+  'entity_type' => 'node',
+  'type' => 'textarea',
+  'cardinality' => 1,
+  'translatable' => TRUE,
+  'locked' => FALSE,
+]);
+$storage->save();
+
+// Add the first field.
+$field_name = 'custom_field1';
+$field_label = 'Custom Field 1';
+$field = FieldConfig::create([
+  'field_name' => $field_name,
+  'entity_type' => 'node',
+  'bundle' => $type,
+  'label' => $field_label,
+  'required' => TRUE,
+  'settings' => [
+    'max_length' => 255,
+  ],
+  'field_type' => 'textarea',
+]);
+$field->save();
+
+// Create the field storage for custom_field12
+$storage = FieldStorageConfig::create([
+  'field_name' => 'custom_field2',
+  'entity_type' => 'node',
+  'type' => 'textarea',
+  'cardinality' => 1,
+  'translatable' => TRUE,
+  'locked' => FALSE,
+]);
+$storage->save();
+
+// Add the second field.
+$field_name = 'custom_field2';
+$field_label = 'Custom Field 2';
+$field = FieldConfig::create([
+  'field_name' => $field_name,
+  'entity_type' => 'node',
+  'bundle' => $type,
+  'label' => $field_label,
+  'required' => FALSE,
+  'field_type' => 'textarea',
+]);
+$field->save();
 }
 
-// hook_form_form_id_alter
 
-function landingpage_form_node_article_form_alter(&$form, $form_state, $form_id) {
-    // if ($form_id === 'node_article_form')
-    $form['additional_field'] = [
-        '#type' => 'textfield',
-        '#title' => t('Additinal Field'),
-        '#default_value' => '',
-        '#required' => FALSE,
-      ];
-      $form['#submit'][] = 'custom_field_form_submit';
-      function custom_field_form_submit(array &$form, FormStateInterface $form_state)
-    {
-        $entity= $form_state->getFormObject()->getEntity();
-        $field = $form_state->getValue('additional_field');
-        $form_state->setValue('additional_field',$field);
-        $form_state->set('entity',$entity);
-        $entity->formSubmit($form,$form_state);
-        kint($field);
-    }
+$storage = FieldStorageConfig::create([
+  'field_name' => 'additional_field1',
+  'entity_type' => 'node',
+  'type' => 'text',
+  'cardinality' => 1,
+  'translatable' => TRUE,
+  'locked' => FALSE,
+]);
+$storage->save();
+
+$field_name = 'additional_field1';
+$field_label = 'Additional Field 1';
+$field = FieldConfig::create([
+  'field_name' => $field_name,
+  'entity_type' => 'node',
+  'bundle' => 'article',
+  'label' => $field_label,
+  'required' => TRUE,
+  'settings' => [
+    'max_length' => 255,
+  ],
+  'field_type' => 'text',
+]);
+$field->save();
 }
